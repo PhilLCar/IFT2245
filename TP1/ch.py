@@ -8,10 +8,19 @@ import sys
 
 #-------------------------------------------------------------------------------| MAX-COL
 
+def read():
+    text = ""
+    while True:
+        a = sys.stdin.read()
+        # éventuellement pour gérer les flèches
+
 def main():
+    index = 0
+    history = []
+    start_path = os.getcwd();
     while True:
         try:
-            sys.stdout.write(os.getcwd() + " %% ")
+            sys.stdout.write(os.getcwd() + " % ")
             
             sys.stdout.flush()
             
@@ -23,11 +32,19 @@ def main():
             command = user_input[0]
             args = user_input[1:]
 
+            history += command
+
             if command == "cd":
-                os.chdir(args[0])
+                if len(args) == 0:
+                    os.chdir(start_path)
+                else:
+                    try:
+                        os.chdir(args[0])
+                    except:
+                        sys.stdout.write("No such file or directory: " + args[0] + "\n")
 
             # http://stackoverflow.com/questions/25113767/infinite-while-not-working-with-os-execvp
-            if command in ["cat", "bc", "ls"]:
+            if command in ["cat", "bc", "ls"]: #Ajouter toutes commandes de base
                 pid = os.fork()
                 if pid:
                     os.waitpid(pid, 0)
