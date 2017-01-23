@@ -8,16 +8,12 @@ import sys
 
 #-------------------------------------------------------------------------------| MAX-COL
 
-def read():
-    text = ""
-    while True:
-        a = sys.stdin.read()
-        # éventuellement pour gérer les flèches
-
 def main():
     index = 0
     history = []
-    start_path = os.getcwd();
+    start_path = os.getcwd()
+    out = sys.stdout
+    
     while True:
         try:
             sys.stdout.write(os.getcwd() + " % ")
@@ -30,10 +26,31 @@ def main():
             else: user_input = user_input[:-1].split(' ')
         
             command = user_input[0]
-            args = user_input[1:]
+            p_args = user_input[1:]
 
+            # Gestion de l'historique de commande
             history += command
 
+            ### GESTION DE LA REDIRECTION (3) ### !!! Pour l'instant juste 1 redirection possible
+            redir_in = []
+            redir_out = []
+            args = []
+            
+            for arg in p_args:
+                if arg[0] == '<':
+                    redir_in += [arg[1:]]
+                elif arg[0] == '>':
+                    redir_out += [arg[1:]]
+                else:
+                    args += [arg]
+
+            if len(redir_out):
+                out = os.fdopen(os.open(redir_out[0],
+                    os.O_CREAT |
+                    os.O_WRONLY |
+                    os.O_TRUNC), 'w+')
+
+            ### INTERPRÉTATION DES COMMANDES (1) ###
             if command == "cd":
                 if len(args) == 0:
                     os.chdir(start_path)
@@ -49,6 +66,7 @@ def main():
                 if pid:
                     os.waitpid(pid, 0)
                 else:
+                    sys.stdout = out # ne fonctionne pas
                     os.execv('/usr/bin/' + command, [command] + args)
                 
             if command == "exit":
