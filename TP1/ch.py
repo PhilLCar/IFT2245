@@ -111,8 +111,8 @@ def main():
             elif command == "exit":
                 break
 
-            # http://stackoverflow.com/questions/25113767/infinite-while-not-working-with-os-execvp
-            else: #Ajouter toutes commandes de base
+            # http://stackoverflow.com/questions/25113767
+            else:
                 try:
                     if pid:
                         pid = os.fork()
@@ -121,7 +121,7 @@ def main():
                     else:
                         os.dup2(stdout, 1) # redirige le output de stdout (1)
                         os.dup2(stdin, 0)
-                        os.execv('/usr/bin/' + command, [command] + args)
+                        os.execvp(command, [command] + args)
                 except:
                     sys.stdout.write("ch: " + command + ": command not found\n")
                     sys.exit(1)
